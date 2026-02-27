@@ -8,6 +8,8 @@ ZSHRC_CUSTOM="$HOME/.zshrc_custom"
 LOCAL_BIN="$HOME/.local/bin"
 CUSTOM_SOURCE_LINE='[ -f "$HOME/.zshrc_custom" ] && source "$HOME/.zshrc_custom"'
 TMUX_CONF="$HOME/.tmux.conf"
+GITCONFIG_DOTFILES="$HOME/.gitconfig_dotfiles"
+GITCONFIG_INCLUDE='[include]\n\tpath = ~/.gitconfig_dotfiles'
 
 # 1. Install Starship prompt
 if ! command -v starship >/dev/null 2>&1; then
@@ -38,7 +40,16 @@ if ! grep -Fqx "$CUSTOM_SOURCE_LINE" "$ZSHRC"; then
   printf '\n# Dotfiles custom config\n%s\n' "$CUSTOM_SOURCE_LINE" >> "$ZSHRC"
 fi
 
-# 4. Install tmux config
+# 4. Install git config (via include, preserves user.name/email)
+echo "==> Installing ~/.gitconfig_dotfiles..."
+cp "$DOTFILES_DIR/config/gitconfig" "$GITCONFIG_DOTFILES"
+
+if ! grep -q 'path = ~/.gitconfig_dotfiles' "$HOME/.gitconfig" 2>/dev/null; then
+  echo "==> Adding include to ~/.gitconfig..."
+  printf '\n[include]\n\tpath = ~/.gitconfig_dotfiles\n' >> "$HOME/.gitconfig"
+fi
+
+# 5. Install tmux config
 echo "==> Installing ~/.tmux.conf..."
 cp "$DOTFILES_DIR/config/tmux.conf" "$TMUX_CONF"
 

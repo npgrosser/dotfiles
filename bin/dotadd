@@ -10,7 +10,7 @@ Usage:
 
 Packages:
   claude    Claude CLI
-  nvm       Node Version Manager
+  node      Node.js (via nvm)
   uv        Python package manager
   gcloud    Google Cloud CLI
 EOF
@@ -20,8 +20,8 @@ have_claude() {
   command -v claude >/dev/null 2>&1 || [ -x "$HOME/.local/bin/claude" ]
 }
 
-have_nvm() {
-  [ -s "$HOME/.nvm/nvm.sh" ]
+have_node() {
+  command -v node >/dev/null 2>&1
 }
 
 have_uv() {
@@ -41,13 +41,19 @@ add_claude() {
   curl -fsSL https://claude.ai/install.sh | bash
 }
 
-add_nvm() {
-  if have_nvm; then
-    echo "nvm: already installed"
+add_node() {
+  if have_node; then
+    echo "node: already installed"
     return
   fi
-  echo "nvm: installing..."
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
+  if [ ! -s "$HOME/.nvm/nvm.sh" ]; then
+    echo "node: installing nvm..."
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
+  fi
+  export NVM_DIR="$HOME/.nvm"
+  . "$NVM_DIR/nvm.sh"
+  echo "node: installing latest..."
+  nvm install node
 }
 
 add_uv() {
@@ -70,7 +76,7 @@ add_gcloud() {
 
 list_packages() {
   if have_claude; then echo "claude: installed"; else echo "claude: not installed"; fi
-  if have_nvm; then echo "nvm: installed"; else echo "nvm: not installed"; fi
+  if have_node; then echo "node: installed"; else echo "node: not installed"; fi
   if have_uv; then echo "uv: installed"; else echo "uv: not installed"; fi
   if have_gcloud; then echo "gcloud: installed"; else echo "gcloud: not installed"; fi
 }
@@ -82,12 +88,12 @@ fi
 
 case "$1" in
   claude) add_claude ;;
-  nvm) add_nvm ;;
+  node) add_node ;;
   uv) add_uv ;;
   gcloud) add_gcloud ;;
   all)
     add_claude
-    add_nvm
+    add_node
     add_uv
     add_gcloud
     ;;

@@ -1,0 +1,4 @@
+[init]
+	defaultBranch = main
+[alias]
+	lg = log --oneline --graph --decorate --all
