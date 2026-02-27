@@ -57,6 +57,18 @@ if ! grep -q 'starship init zsh' "$ZSHRC"; then
   printf '\n# Starship prompt\neval "$(starship init zsh)"\n' >> "$ZSHRC"
 fi
 
+# 6. Warn if default shell is not zsh (no automatic chsh)
+LOGIN_SHELL="$(getent passwd "$(id -un)" | cut -d: -f7 || true)"
+if [ -z "$LOGIN_SHELL" ]; then
+  LOGIN_SHELL="${SHELL:-}"
+fi
+
+if [[ "$LOGIN_SHELL" != */zsh ]]; then
+  echo ""
+  echo "==> Warning: default login shell is not zsh (${LOGIN_SHELL:-unknown})."
+  echo "    Dotfiles are configured for zsh. Start zsh with: exec zsh"
+fi
+
 echo ""
 echo "==> Dotfiles installed!"
 echo "    Restart your shell or run: exec zsh"
