@@ -53,6 +53,44 @@ fi
 echo "==> Installing ~/.tmux.conf..."
 cp "$DOTFILES_DIR/config/tmux.conf" "$TMUX_CONF"
 
+# 4b. Install shell tools (eza, bat, rg)
+_latest_tag() {
+  curl -fsSL "https://api.github.com/repos/$1/releases/latest" \
+    | grep -o '"tag_name": *"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"'
+}
+_arch_musl() { uname -m; }
+
+if ! command -v eza >/dev/null 2>&1 && [ ! -x "$LOCAL_BIN/eza" ]; then
+  echo "==> Installing eza..."
+  _tag="$(_latest_tag eza-community/eza)"
+  _tmp="$(mktemp -d)"
+  curl -fsSL "https://github.com/eza-community/eza/releases/download/${_tag}/eza_$(_arch_musl)-unknown-linux-musl.tar.gz" \
+    | tar -xz -C "$_tmp"
+  mv "$_tmp/eza" "$LOCAL_BIN/eza"
+  rm -rf "$_tmp"
+fi
+
+if ! command -v bat >/dev/null 2>&1 && [ ! -x "$LOCAL_BIN/bat" ]; then
+  echo "==> Installing bat..."
+  _tag="$(_latest_tag sharkdp/bat)"
+  _tmp="$(mktemp -d)"
+  curl -fsSL "https://github.com/sharkdp/bat/releases/download/${_tag}/bat-${_tag}-$(_arch_musl)-unknown-linux-musl.tar.gz" \
+    | tar -xz -C "$_tmp"
+  mv "$_tmp/bat-${_tag}-$(_arch_musl)-unknown-linux-musl/bat" "$LOCAL_BIN/bat"
+  rm -rf "$_tmp"
+fi
+
+if ! command -v rg >/dev/null 2>&1 && [ ! -x "$LOCAL_BIN/rg" ]; then
+  echo "==> Installing ripgrep..."
+  _tag="$(_latest_tag BurntSushi/ripgrep)"
+  _ver="${_tag#v}"
+  _tmp="$(mktemp -d)"
+  curl -fsSL "https://github.com/BurntSushi/ripgrep/releases/download/${_tag}/ripgrep-${_ver}-$(_arch_musl)-unknown-linux-musl.tar.gz" \
+    | tar -xz -C "$_tmp"
+  mv "$_tmp/ripgrep-${_ver}-$(_arch_musl)-unknown-linux-musl/rg" "$LOCAL_BIN/rg"
+  rm -rf "$_tmp"
+fi
+
 # 5. Install zsh plugins
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 
@@ -62,10 +100,33 @@ if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
     "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
 fi
 
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
+  echo "==> Installing zsh-syntax-highlighting..."
+  git clone --depth 1 https://github.com/zsh-users/zsh-syntax-highlighting \
+    "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+fi
+
+# 5b. Install fzf
+if [ ! -d "$HOME/.fzf" ]; then
+  echo "==> Installing fzf..."
+  git clone --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf"
+  "$HOME/.fzf/install" --all --no-update-rc
+fi
+
 # 6. Configure .zshrc
 if grep -q 'plugins=(git)' "$ZSHRC"; then
   echo "==> Configuring zsh plugins..."
-  sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions sudo)/' "$ZSHRC"
+  sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting sudo)/' "$ZSHRC"
+fi
+
+# Idempotent: add zsh-syntax-highlighting if missing (handles re-runs after old setup)
+if ! grep -q 'zsh-syntax-highlighting' "$ZSHRC"; then
+  sed -i 's/plugins=(\([^)]*\))/plugins=(\1 zsh-syntax-highlighting)/' "$ZSHRC"
+fi
+
+if ! grep -q 'fzf.zsh' "$ZSHRC"; then
+  echo "==> Adding fzf to .zshrc..."
+  printf '\n# fzf key bindings and completion\n[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh\n' >> "$ZSHRC"
 fi
 
 if ! grep -q 'starship init zsh' "$ZSHRC"; then

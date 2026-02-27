@@ -14,7 +14,23 @@ Packages:
   uv        Python package manager
   rust      Rust toolchain (via rustup)
   gcloud    Google Cloud CLI
+  gh        GitHub CLI
 EOF
+}
+
+# Returns latest GitHub release tag for owner/repo
+_latest_tag() {
+  curl -fsSL "https://api.github.com/repos/$1/releases/latest" \
+    | grep -o '"tag_name": *"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"'
+}
+
+# Returns amd64 or arm64
+_arch_go() {
+  case "$(uname -m)" in
+    x86_64) echo "amd64" ;;
+    aarch64) echo "arm64" ;;
+    *) uname -m ;;
+  esac
 }
 
 have_claude() {
@@ -35,6 +51,10 @@ have_rust() {
 
 have_gcloud() {
   command -v gcloud >/dev/null 2>&1 || [ -d "$HOME/google-cloud-sdk" ]
+}
+
+have_gh() {
+  command -v gh >/dev/null 2>&1 || [ -x "$HOME/.local/bin/gh" ]
 }
 
 add_claude() {
@@ -88,12 +108,31 @@ add_gcloud() {
   curl -fsSL https://sdk.cloud.google.com | bash -s -- --disable-prompts
 }
 
+add_gh() {
+  if have_gh; then
+    echo "gh: already installed"
+    return
+  fi
+  echo "gh: installing..."
+  local tag version arch tmp
+  tag="$(_latest_tag cli/cli)"
+  version="${tag#v}"
+  arch="$(_arch_go)"
+  tmp="$(mktemp -d)"
+  curl -fsSL "https://github.com/cli/cli/releases/download/${tag}/gh_${version}_linux_${arch}.tar.gz" \
+    | tar -xz -C "$tmp"
+  mkdir -p "$HOME/.local/bin"
+  mv "$tmp/gh_${version}_linux_${arch}/bin/gh" "$HOME/.local/bin/gh"
+  rm -rf "$tmp"
+}
+
 list_packages() {
   if have_claude; then echo "claude: installed"; else echo "claude: not installed"; fi
-  if have_node; then echo "node: installed"; else echo "node: not installed"; fi
-  if have_uv; then echo "uv: installed"; else echo "uv: not installed"; fi
-  if have_rust; then echo "rust: installed"; else echo "rust: not installed"; fi
+  if have_node;   then echo "node:   installed"; else echo "node:   not installed"; fi
+  if have_uv;     then echo "uv:     installed"; else echo "uv:     not installed"; fi
+  if have_rust;   then echo "rust:   installed"; else echo "rust:   not installed"; fi
   if have_gcloud; then echo "gcloud: installed"; else echo "gcloud: not installed"; fi
+  if have_gh;     then echo "gh:     installed"; else echo "gh:     not installed"; fi
 }
 
 if [ "$#" -lt 1 ]; then
@@ -103,16 +142,18 @@ fi
 
 case "$1" in
   claude) add_claude ;;
-  node) add_node ;;
-  uv) add_uv ;;
-  rust) add_rust ;;
+  node)   add_node ;;
+  uv)     add_uv ;;
+  rust)   add_rust ;;
   gcloud) add_gcloud ;;
+  gh)     add_gh ;;
   all)
     add_claude
     add_node
     add_uv
     add_rust
     add_gcloud
+    add_gh
     ;;
   list)
     list_packages

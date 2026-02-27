@@ -6,7 +6,17 @@ fi
 export EDITOR="vim"
 export VISUAL="vim"
 
+# Shell aliases
 alias t="tmux"
+alias ll='ls -alF'
+alias la='ls -A'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias grep='grep --color=auto'
+
+# Use eza/bat if available
+command -v eza >/dev/null 2>&1 && alias ls='eza --icons'
+command -v bat >/dev/null 2>&1 && alias cat='bat'
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
