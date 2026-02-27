@@ -1,0 +1,52 @@
+# Starship – Tokyo Night preset
+# https://starship.rs/presets/tokyo-night
+
+palette = "tokyo-night"
+
+[palettes.tokyo-night]
+red = "#f7768e"
+green = "#9ece6a"
+yellow = "#e0af68"
+blue = "#7aa2f7"
+magenta = "#bb9af7"
+cyan = "#7dcfff"
+white = "#a9b1d6"
+bright-black = "#414868"
+foreground = "#c0caf5"
+selection-background = "#33467c"
+comment = "#565f89"
+
+[character]
+success_symbol = "[❯](green)"
+error_symbol = "[❯](red)"
+
+[directory]
+style = "blue"
+
+[git_branch]
+style = "magenta"
+
+[git_status]
+style = "red"
+
+[cmd_duration]
+style = "yellow"
+
+[python]
+style = "green"
+
+[nodejs]
+style = "green"
+
+[package]
+style = "yellow"
+
+[docker_context]
+style = "cyan"
+
+[username]
+style_user = "cyan"
+style_root = "red"
+
+[hostname]
+style = "green"
