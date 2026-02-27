@@ -12,6 +12,7 @@ Packages:
   claude    Claude CLI
   node      Node.js (via nvm)
   uv        Python package manager
+  rust      Rust toolchain (via rustup)
   gcloud    Google Cloud CLI
 EOF
 }
@@ -26,6 +27,10 @@ have_node() {
 
 have_uv() {
   command -v uv >/dev/null 2>&1 || [ -x "$HOME/.local/bin/uv" ]
+}
+
+have_rust() {
+  command -v rustc >/dev/null 2>&1 || [ -x "$HOME/.cargo/bin/rustc" ]
 }
 
 have_gcloud() {
@@ -65,6 +70,15 @@ add_uv() {
   curl -LsSf https://astral.sh/uv/install.sh | sh
 }
 
+add_rust() {
+  if have_rust; then
+    echo "rust: already installed"
+    return
+  fi
+  echo "rust: installing..."
+  curl -fsSL https://sh.rustup.rs | sh -s -- -y
+}
+
 add_gcloud() {
   if have_gcloud; then
     echo "gcloud: already installed"
@@ -78,6 +92,7 @@ list_packages() {
   if have_claude; then echo "claude: installed"; else echo "claude: not installed"; fi
   if have_node; then echo "node: installed"; else echo "node: not installed"; fi
   if have_uv; then echo "uv: installed"; else echo "uv: not installed"; fi
+  if have_rust; then echo "rust: installed"; else echo "rust: not installed"; fi
   if have_gcloud; then echo "gcloud: installed"; else echo "gcloud: not installed"; fi
 }
 
@@ -90,11 +105,13 @@ case "$1" in
   claude) add_claude ;;
   node) add_node ;;
   uv) add_uv ;;
+  rust) add_rust ;;
   gcloud) add_gcloud ;;
   all)
     add_claude
     add_node
     add_uv
+    add_rust
     add_gcloud
     ;;
   list)
