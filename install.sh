@@ -4,6 +4,10 @@
 #  Sets up the personal dev-shell environment.
 #  Designed to be idempotent – safe to re-run.
 #
+#  Files are COPIED (not symlinked) so that things still
+#  work when the dotfiles source dir is cleaned up
+#  (e.g. DevPod clones into a temp directory).
+#
 #  Usage:
 #    bash install.sh              # interactive
 #    NONINTERACTIVE=1 bash install.sh   # CI / devcontainer
@@ -17,13 +21,13 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # ── 1. Install Starship prompt ───────────────────────────
 if ! command -v starship &>/dev/null; then
   echo "==> Installing Starship..."
-  curl -sS https://starship.rs/install.sh | sh -s -- --yes
+  curl -sS https://starship.rs/install.sh | sh -s -- --yes > /dev/null
 fi
 
-# ── 2. Link starship.toml ────────────────────────────────
-echo "==> Linking starship.toml..."
+# ── 2. Copy starship.toml ────────────────────────────────
+echo "==> Copying starship.toml..."
 mkdir -p ~/.config
-ln -sf "$DOTFILES_DIR/starship.toml" ~/.config/starship.toml
+cp "$DOTFILES_DIR/starship.toml" ~/.config/starship.toml
 
 # ── 3. Zsh plugins (oh-my-zsh assumed pre-installed) ─────
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
@@ -42,17 +46,11 @@ if [ -f ~/.zshrc ]; then
     sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions sudo)/' ~/.zshrc
   fi
 
-  # Source .zshrc.local for personal config (starship, aliases, etc.)
-  if ! grep -q '.zshrc.local' ~/.zshrc; then
-    echo "==> Adding .zshrc.local source to .zshrc..."
-    printf '\n# Personal dotfiles config\n[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local\n' >> ~/.zshrc
+  # Add starship init directly (no external file needed)
+  if ! grep -q 'starship init zsh' ~/.zshrc; then
+    echo "==> Adding Starship init to .zshrc..."
+    printf '\n# Starship prompt\neval "$(starship init zsh)"\n' >> ~/.zshrc
   fi
-fi
-
-# Link .zshrc.local
-if [ -f "$DOTFILES_DIR/.zshrc.local" ]; then
-  echo "==> Linking .zshrc.local..."
-  ln -sf "$DOTFILES_DIR/.zshrc.local" ~/.zshrc.local
 fi
 
 # ── 5. Set default shell to zsh ──────────────────────────

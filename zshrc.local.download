@@ -1,6 +1,0 @@
-# ──────────────────────────────────────────────────────────
-#  .zshrc.local – personal zsh config (sourced from .zshrc)
-# ──────────────────────────────────────────────────────────
-
-# Starship prompt
-eval "$(starship init zsh)"
