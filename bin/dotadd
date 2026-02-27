@@ -12,6 +12,7 @@ Packages:
   claude    Claude CLI
   nvm       Node Version Manager
   uv        Python package manager
+  gcloud    Google Cloud CLI
 EOF
 }
 
@@ -25,6 +26,10 @@ have_nvm() {
 
 have_uv() {
   command -v uv >/dev/null 2>&1 || [ -x "$HOME/.local/bin/uv" ]
+}
+
+have_gcloud() {
+  command -v gcloud >/dev/null 2>&1 || [ -d "$HOME/google-cloud-sdk" ]
 }
 
 add_claude() {
@@ -54,10 +59,20 @@ add_uv() {
   curl -LsSf https://astral.sh/uv/install.sh | sh
 }
 
+add_gcloud() {
+  if have_gcloud; then
+    echo "gcloud: already installed"
+    return
+  fi
+  echo "gcloud: installing..."
+  curl -fsSL https://sdk.cloud.google.com | bash -s -- --disable-prompts
+}
+
 list_packages() {
   if have_claude; then echo "claude: installed"; else echo "claude: not installed"; fi
   if have_nvm; then echo "nvm: installed"; else echo "nvm: not installed"; fi
   if have_uv; then echo "uv: installed"; else echo "uv: not installed"; fi
+  if have_gcloud; then echo "gcloud: installed"; else echo "gcloud: not installed"; fi
 }
 
 if [ "$#" -lt 1 ]; then
@@ -69,10 +84,12 @@ case "$1" in
   claude) add_claude ;;
   nvm) add_nvm ;;
   uv) add_uv ;;
+  gcloud) add_gcloud ;;
   all)
     add_claude
     add_nvm
     add_uv
+    add_gcloud
     ;;
   list)
     list_packages

@@ -7,6 +7,7 @@ ZSHRC="$HOME/.zshrc"
 ZSHRC_CUSTOM="$HOME/.zshrc_custom"
 LOCAL_BIN="$HOME/.local/bin"
 CUSTOM_SOURCE_LINE='[ -f "$HOME/.zshrc_custom" ] && source "$HOME/.zshrc_custom"'
+TMUX_CONF="$HOME/.tmux.conf"
 
 # 1. Install Starship prompt
 if ! command -v starship >/dev/null 2>&1; then
@@ -37,7 +38,11 @@ if ! grep -Fqx "$CUSTOM_SOURCE_LINE" "$ZSHRC"; then
   printf '\n# Dotfiles custom config\n%s\n' "$CUSTOM_SOURCE_LINE" >> "$ZSHRC"
 fi
 
-# 4. Install zsh plugins
+# 4. Install tmux config
+echo "==> Installing ~/.tmux.conf..."
+cp "$DOTFILES_DIR/config/tmux.conf" "$TMUX_CONF"
+
+# 5. Install zsh plugins
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 
 if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
@@ -46,7 +51,7 @@ if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
     "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
 fi
 
-# 5. Configure .zshrc
+# 6. Configure .zshrc
 if grep -q 'plugins=(git)' "$ZSHRC"; then
   echo "==> Configuring zsh plugins..."
   sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions sudo)/' "$ZSHRC"
