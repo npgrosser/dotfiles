@@ -9,6 +9,8 @@ Personal zsh shell and prompt setup.
 curl -fsSL https://raw.githubusercontent.com/npgrosser/dotfiles/refs/heads/main/install.sh | bash
 ```
 
+`install.sh` is a bootstrapper. It downloads the repo archive and runs `scripts/setup.sh`.
+
 ## What it sets up
 
 - Installs Starship prompt (if missing)
@@ -18,6 +20,13 @@ curl -fsSL https://raw.githubusercontent.com/npgrosser/dotfiles/refs/heads/main/
 - Installs `~/.zshrc_custom` and sources it from `~/.zshrc`
 - Ensures `~/.local/bin` is in `PATH` (via `~/.zshrc_custom`)
 - Adds `~/.local/bin/install-claude` helper command
+
+## Structure
+
+- `install.sh` → bootstrap entrypoint (local or remote)
+- `scripts/setup.sh` → main idempotent setup logic
+- `config/zshrc_custom` → user zsh custom config
+- `config/install-claude` → on-demand Claude installer command
 
 After install, restart your shell or run:
 
