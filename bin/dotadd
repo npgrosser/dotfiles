@@ -15,6 +15,7 @@ Packages:
   rust      Rust toolchain (via rustup)
   gcloud    Google Cloud CLI
   gh        GitHub CLI
+  cursor    Cursor CLI
 EOF
 }
 
@@ -55,6 +56,10 @@ have_gcloud() {
 
 have_gh() {
   command -v gh >/dev/null 2>&1 || [ -x "$HOME/.local/bin/gh" ]
+}
+
+have_cursor() {
+  command -v cursor >/dev/null 2>&1 || [ -x "$HOME/.local/bin/cursor" ]
 }
 
 add_claude() {
@@ -108,6 +113,15 @@ add_gcloud() {
   curl -fsSL https://sdk.cloud.google.com | bash -s -- --disable-prompts
 }
 
+add_cursor() {
+  if have_cursor; then
+    echo "cursor: already installed"
+    return
+  fi
+  echo "cursor: installing..."
+  curl -fsSL https://cursor.com/install | bash
+}
+
 add_gh() {
   if have_gh; then
     echo "gh: already installed"
@@ -133,6 +147,7 @@ list_packages() {
   if have_rust;   then echo "rust:   installed"; else echo "rust:   not installed"; fi
   if have_gcloud; then echo "gcloud: installed"; else echo "gcloud: not installed"; fi
   if have_gh;     then echo "gh:     installed"; else echo "gh:     not installed"; fi
+  if have_cursor; then echo "cursor: installed"; else echo "cursor: not installed"; fi
 }
 
 if [ "$#" -lt 1 ]; then
@@ -147,6 +162,7 @@ case "$1" in
   rust)   add_rust ;;
   gcloud) add_gcloud ;;
   gh)     add_gh ;;
+  cursor) add_cursor ;;
   all)
     add_claude
     add_node
@@ -154,6 +170,7 @@ case "$1" in
     add_rust
     add_gcloud
     add_gh
+    add_cursor
     ;;
   list)
     list_packages
