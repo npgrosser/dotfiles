@@ -16,7 +16,8 @@ set -euo pipefail
 
 _sudo() { if [ "$(id -u)" -eq 0 ]; then "$@"; else sudo "$@"; fi; }
 
-DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_SOURCE="${BASH_SOURCE[0]:-$0}"
+DOTFILES_DIR="$(cd "$(dirname "$SCRIPT_SOURCE")" && pwd)"
 ZSHRC="$HOME/.zshrc"
 ZSHRC_CUSTOM="$HOME/.zshrc_custom"
 LOCAL_BIN="$HOME/.local/bin"
