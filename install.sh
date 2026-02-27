@@ -24,10 +24,10 @@ if ! command -v starship &>/dev/null; then
   curl -sS https://starship.rs/install.sh | sh -s -- --yes > /dev/null
 fi
 
-# ── 2. Copy starship.toml ────────────────────────────────
-echo "==> Copying starship.toml..."
+# ── 2. Apply Starship tokyo-night preset ─────────────────
+echo "==> Applying Starship tokyo-night preset..."
 mkdir -p ~/.config
-cp "$DOTFILES_DIR/starship.toml" ~/.config/starship.toml
+starship preset tokyo-night -o ~/.config/starship.toml
 
 # ── 3. Zsh plugins (oh-my-zsh assumed pre-installed) ─────
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
