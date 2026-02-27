@@ -23,10 +23,10 @@ starship preset tokyo-night -o "$HOME/.config/starship.toml"
 echo "==> Installing ~/.zshrc_custom..."
 cp "$DOTFILES_DIR/config/zshrc_custom" "$ZSHRC_CUSTOM"
 
-echo "==> Installing install-claude helper..."
+echo "==> Installing dotadd helper..."
 mkdir -p "$LOCAL_BIN"
-cp "$DOTFILES_DIR/config/install-claude" "$LOCAL_BIN/install-claude"
-chmod +x "$LOCAL_BIN/install-claude"
+cp "$DOTFILES_DIR/bin/dotadd" "$LOCAL_BIN/dotadd"
+chmod +x "$LOCAL_BIN/dotadd"
 
 if [ ! -f "$ZSHRC" ]; then
   touch "$ZSHRC"
@@ -66,10 +66,10 @@ fi
 if [[ "$LOGIN_SHELL" != */zsh ]]; then
   echo ""
   echo "==> Warning: default login shell is not zsh (${LOGIN_SHELL:-unknown})."
-  echo "    Dotfiles are configured for zsh. Start zsh with: exec zsh"
+  echo "    Dotfiles are configured for zsh."
 fi
 
 echo ""
 echo "==> Dotfiles installed!"
 echo "    Restart your shell or run: exec zsh"
-echo "    Then run: install-claude"
+echo "    Then run: dotadd list"

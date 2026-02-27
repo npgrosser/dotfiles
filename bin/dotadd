@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage:
+  dotadd <package>
+  dotadd all
+  dotadd list
+
+Packages:
+  claude    Claude CLI
+  nvm       Node Version Manager
+  uv        Python package manager
+EOF
+}
+
+have_claude() {
+  command -v claude >/dev/null 2>&1 || [ -x "$HOME/.local/bin/claude" ]
+}
+
+have_nvm() {
+  [ -s "$HOME/.nvm/nvm.sh" ]
+}
+
+have_uv() {
+  command -v uv >/dev/null 2>&1 || [ -x "$HOME/.local/bin/uv" ]
+}
+
+add_claude() {
+  if have_claude; then
+    echo "claude: already installed"
+    return
+  fi
+  echo "claude: installing..."
+  curl -fsSL https://claude.ai/install.sh | bash
+}
+
+add_nvm() {
+  if have_nvm; then
+    echo "nvm: already installed"
+    return
+  fi
+  echo "nvm: installing..."
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
+}
+
+add_uv() {
+  if have_uv; then
+    echo "uv: already installed"
+    return
+  fi
+  echo "uv: installing..."
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+}
+
+list_packages() {
+  if have_claude; then echo "claude: installed"; else echo "claude: not installed"; fi
+  if have_nvm; then echo "nvm: installed"; else echo "nvm: not installed"; fi
+  if have_uv; then echo "uv: installed"; else echo "uv: not installed"; fi
+}
+
+if [ "$#" -lt 1 ]; then
+  usage
+  exit 1
+fi
+
+case "$1" in
+  claude) add_claude ;;
+  nvm) add_nvm ;;
+  uv) add_uv ;;
+  all)
+    add_claude
+    add_nvm
+    add_uv
+    ;;
+  list)
+    list_packages
+    ;;
+  -h|--help|help)
+    usage
+    ;;
+  *)
+    echo "Unknown package: $1"
+    usage
+    exit 1
+    ;;
+esac

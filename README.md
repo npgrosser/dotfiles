@@ -19,14 +19,14 @@ curl -fsSL https://raw.githubusercontent.com/npgrosser/dotfiles/refs/heads/main/
 - Updates `~/.zshrc` plugins and Starship init
 - Installs `~/.zshrc_custom` and sources it from `~/.zshrc`
 - Ensures `~/.local/bin` is in `PATH` (via `~/.zshrc_custom`)
-- Adds `~/.local/bin/install-claude` helper command
+- Adds `~/.local/bin/dotadd` helper command
 
 ## Structure
 
 - `install.sh` → bootstrap entrypoint (local or remote)
 - `scripts/setup.sh` → main idempotent setup logic
 - `config/zshrc_custom` → user zsh custom config
-- `config/install-claude` → on-demand Claude installer command
+- `bin/dotadd` → personal package helper (`claude`, `nvm`, `uv`)
 
 After install, restart your shell or run:
 
@@ -34,25 +34,18 @@ After install, restart your shell or run:
 exec zsh
 ```
 
-Then install Claude on demand:
+Then install tools on demand:
 
 ```bash
-install-claude
+dotadd list
+dotadd claude
+dotadd nvm
+dotadd uv
 ```
-
-## Optional: set zsh as default shell
-
-If your login shell is not already `zsh`, you can set it with:
-
-```bash
-chsh -s "$(command -v zsh)"
-```
-
-Then log out and back in.
 
 ## Troubleshooting
 
-If `install-claude` is "command not found" in the current shell:
+If `dotadd` is "command not found" in the current shell:
 
 ```bash
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc && exec zsh
