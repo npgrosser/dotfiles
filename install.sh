@@ -54,9 +54,14 @@ if [ -f ~/.zshrc ]; then
 fi
 
 # ── 5. Set default shell to zsh ──────────────────────────
-if [ "$(basename "$SHELL")" != "zsh" ] && command -v zsh &>/dev/null; then
-  echo "==> Setting default shell to zsh..."
-  _sudo chsh -s "$(command -v zsh)" "$(whoami)" 2>/dev/null || true
+# Only run chsh in non-devcontainer environments.
+# In devcontainers, the shell is already configured and chsh
+# can interfere with the SSH tunnel (e.g. DevPod).
+if [ -z "${REMOTE_CONTAINERS:-}${CODESPACES:-}${DEVPOD:-}" ]; then
+  if [ "$(basename "$SHELL")" != "zsh" ] && command -v zsh &>/dev/null; then
+    echo "==> Setting default shell to zsh..."
+    _sudo chsh -s "$(command -v zsh)" "$(whoami)" 2>/dev/null || true
+  fi
 fi
 
 echo ""
