@@ -17,6 +17,11 @@ set -euo pipefail
 _sudo() { if [ "$(id -u)" -eq 0 ]; then "$@"; else sudo "$@"; fi; }
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ZSHRC="$HOME/.zshrc"
+ZSHRC_CUSTOM="$HOME/.zshrc_custom"
+LOCAL_BIN="$HOME/.local/bin"
+INSTALL_CLAUDE_CMD="$LOCAL_BIN/install-claude"
+CUSTOM_SOURCE_LINE='[ -f "$HOME/.zshrc_custom" ] && source "$HOME/.zshrc_custom"'
 
 # ── 1. Install Starship prompt ───────────────────────────
 if ! command -v starship &>/dev/null; then
@@ -29,7 +34,48 @@ echo "==> Applying Starship tokyo-night preset..."
 mkdir -p ~/.config
 starship preset tokyo-night -o ~/.config/starship.toml
 
-# ── 3. Zsh plugins (oh-my-zsh assumed pre-installed) ─────
+# ── 3. Manage custom zsh config + helper commands ─────────
+echo "==> Installing ~/.zshrc_custom..."
+cat > "$ZSHRC_CUSTOM" <<'EOF'
+# Dotfiles custom zsh config
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+  export PATH="$HOME/.local/bin:$PATH"
+fi
+EOF
+
+echo "==> Installing install-claude helper..."
+mkdir -p "$LOCAL_BIN"
+cat > "$INSTALL_CLAUDE_CMD" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+if command -v claude >/dev/null 2>&1; then
+  echo "Claude CLI already installed: $(command -v claude)"
+  exit 0
+fi
+
+curl -fsSL https://claude.ai/install.sh | bash
+
+if command -v claude >/dev/null 2>&1; then
+  echo "Claude CLI installed: $(command -v claude)"
+elif [ -x "$HOME/.local/bin/claude" ]; then
+  echo "Claude CLI installed at ~/.local/bin/claude (open a new shell or run: exec zsh)"
+else
+  echo "Warning: Claude CLI not detected after installer run."
+fi
+EOF
+chmod +x "$INSTALL_CLAUDE_CMD"
+
+if [ ! -f "$ZSHRC" ]; then
+  touch "$ZSHRC"
+fi
+
+if ! grep -Fqx "$CUSTOM_SOURCE_LINE" "$ZSHRC"; then
+  echo "==> Linking ~/.zshrc_custom from ~/.zshrc..."
+  printf '\n# Dotfiles custom config\n%s\n' "$CUSTOM_SOURCE_LINE" >> "$ZSHRC"
+fi
+
+# ── 4. Zsh plugins (oh-my-zsh assumed pre-installed) ─────
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 
 if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
@@ -38,21 +84,22 @@ if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
     "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
 fi
 
-# ── 4. Configure .zshrc ─────────────────────────────────
-if [ -f ~/.zshrc ]; then
+# ── 5. Configure .zshrc ─────────────────────────────────
+if [ -f "$ZSHRC" ]; then
   # Add plugins
-  if grep -q 'plugins=(git)' ~/.zshrc; then
+  if grep -q 'plugins=(git)' "$ZSHRC"; then
     echo "==> Configuring zsh plugins..."
-    sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions sudo)/' ~/.zshrc
+    sed -i 's/plugins=(git)/plugins=(git zsh-autosuggestions sudo)/' "$ZSHRC"
   fi
 
   # Add starship init directly (no external file needed)
-  if ! grep -q 'starship init zsh' ~/.zshrc; then
+  if ! grep -q 'starship init zsh' "$ZSHRC"; then
     echo "==> Adding Starship init to .zshrc..."
-    printf '\n# Starship prompt\neval "$(starship init zsh)"\n' >> ~/.zshrc
+    printf '\n# Starship prompt\neval "$(starship init zsh)"\n' >> "$ZSHRC"
   fi
 fi
 
 echo ""
 echo "==> Dotfiles installed!"
 echo "    Restart your shell or run: exec zsh"
+echo "    Then run: install-claude"
