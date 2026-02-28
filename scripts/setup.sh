@@ -31,6 +31,10 @@ mkdir -p "$LOCAL_BIN"
 cp "$DOTFILES_DIR/bin/dotadd" "$LOCAL_BIN/dotadd"
 chmod +x "$LOCAL_BIN/dotadd"
 
+echo "==> Installing install-vscode-extensions..."
+cp "$DOTFILES_DIR/bin/install-vscode-extensions" "$LOCAL_BIN/install-vscode-extensions"
+chmod +x "$LOCAL_BIN/install-vscode-extensions"
+
 if [ ! -f "$ZSHRC" ]; then
   touch "$ZSHRC"
 fi
@@ -52,6 +56,11 @@ fi
 # 5. Install tmux config
 echo "==> Installing ~/.tmux.conf..."
 cp "$DOTFILES_DIR/config/tmux.conf" "$TMUX_CONF"
+
+# 5a. Install VS Code extensions list
+echo "==> Installing VS Code extensions list..."
+mkdir -p "$HOME/.config/dotfiles"
+cp "$DOTFILES_DIR/config/vscode-extensions.txt" "$HOME/.config/dotfiles/vscode-extensions.txt"
 
 # 4b. Install shell tools (eza, bat, rg)
 _latest_tag() {
