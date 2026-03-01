@@ -204,6 +204,12 @@ else
   fi
 fi
 
+echo "📄 Installing Zellij config..."
+mkdir -p "$HOME/.config/zellij"
+sed "s|__HOME__|$HOME|g" "$DOTFILES_DIR/config/zellij/config.kdl" > "$HOME/.config/zellij/config.kdl"
+cp "$DOTFILES_DIR/config/zellij/copy.sh" "$HOME/.config/zellij/copy.sh"
+chmod +x "$HOME/.config/zellij/copy.sh"
+
 echo "📄 Installing ~/.tmux.conf..."
 cp "$DOTFILES_DIR/config/tmux.conf" "$TMUX_CONF"
 

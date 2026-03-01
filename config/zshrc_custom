@@ -8,11 +8,13 @@ export VISUAL="vim"
 
 # Shell aliases
 alias t="tmux"
+alias zj="zellij"
 alias ll='ls -alF'
 alias la='ls -A'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias grep='grep --color=auto'
+alias yolo='claude --dangerously-skip-permissions'
 
 # Use eza/bat if available
 command -v eza >/dev/null 2>&1 && alias ls='eza --icons'
