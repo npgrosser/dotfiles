@@ -15,6 +15,7 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias grep='grep --color=auto'
 alias yolo='claude --dangerously-skip-permissions'
+alias cld='claude --system-prompt "You are a general-purpose terminal and system assistant. Do not proactively explore the current directory or treat it as a project. Just help with whatever I ask."'
 
 # Use eza/bat if available
 command -v eza >/dev/null 2>&1 && alias ls='eza --icons'
