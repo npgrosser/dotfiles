@@ -20,6 +20,9 @@ alias yolo='claude --dangerously-skip-permissions'
 command -v eza >/dev/null 2>&1 && alias ls='eza --icons'
 command -v bat >/dev/null 2>&1 && alias cat='bat'
 
+# z - jump around (https://github.com/rupa/z)
+[ -f "$HOME/.z/z.sh" ] && . "$HOME/.z/z.sh"
+
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
