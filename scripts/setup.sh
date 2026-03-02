@@ -264,9 +264,10 @@ if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
     "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
 fi
 
-if [ ! -d "$HOME/.z" ]; then
+if [ ! -d "$HOME/.local/share/z" ]; then
   echo "📂 Installing z (rupa/z)..."
-  git clone --depth 1 https://github.com/rupa/z.git "$HOME/.z"
+  mkdir -p "$HOME/.local/share"
+  git clone --depth 1 https://github.com/rupa/z.git "$HOME/.local/share/z"
 fi
 
 if [ ! -d "$HOME/.fzf" ]; then
