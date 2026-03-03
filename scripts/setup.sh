@@ -204,6 +204,10 @@ else
   fi
 fi
 
+echo "📄 Installing Neovim config..."
+mkdir -p "$HOME/.config/nvim/lua/plugins"
+cp "$DOTFILES_DIR/config/nvim/lua/plugins/colorscheme.lua" "$HOME/.config/nvim/lua/plugins/colorscheme.lua"
+
 echo "📄 Installing Zellij config..."
 mkdir -p "$HOME/.config/zellij"
 sed "s|__HOME__|$HOME|g" "$DOTFILES_DIR/config/zellij/config.kdl" > "$HOME/.config/zellij/config.kdl"
