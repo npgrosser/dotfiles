@@ -4,3 +4,7 @@ font-size = 14
 theme = light:"GitHub Light High Contrast",dark:"GitHub Dark High Contrast"
 unfocused-split-opacity = 1
 split-divider-color = #bbbbbb
+keybind = ctrl+shift+h=goto_split:left
+keybind = ctrl+shift+j=goto_split:bottom
+keybind = ctrl+shift+k=goto_split:top
+keybind = ctrl+shift+l=goto_split:right
