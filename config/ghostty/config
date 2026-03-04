@@ -3,3 +3,4 @@ font-size = 15
 theme = "GitHub Light High Contrast"
 background = #f8f8f8
 unfocused-split-opacity = 0.85
+split-divider-color = #cccccc
