@@ -1,6 +1,6 @@
 # Dotfiles
 
-Personal zsh shell and prompt setup. Works on Linux and macOS.
+Personal dotfiles for zsh, prompt, terminal, and editor setup. Works on Linux and macOS.
 
 ## Install
 
