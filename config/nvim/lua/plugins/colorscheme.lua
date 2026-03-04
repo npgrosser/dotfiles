@@ -29,15 +29,15 @@ local function github_colorscheme()
   end
 end
 
+-- Set background early, before any plugin loads
+vim.o.background = detect_system_appearance()
+
 return {
   {
     "projekt0n/github-nvim-theme",
     lazy = false,
     priority = 1000,
     config = function()
-      -- Set background from macOS appearance on startup
-      vim.o.background = detect_system_appearance()
-
       vim.api.nvim_create_autocmd("OptionSet", {
         pattern = "background",
         callback = function()
