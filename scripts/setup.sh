@@ -204,6 +204,10 @@ else
   fi
 fi
 
+echo "📄 Installing Ghostty config..."
+mkdir -p "$HOME/.config/ghostty"
+cp "$DOTFILES_DIR/config/ghostty/config" "$HOME/.config/ghostty/config"
+
 echo "📄 Installing Neovim config..."
 mkdir -p "$HOME/.config/nvim/lua/plugins"
 cp "$DOTFILES_DIR/config/nvim/lua/plugins/colorscheme.lua" "$HOME/.config/nvim/lua/plugins/colorscheme.lua"
