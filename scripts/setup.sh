@@ -206,7 +206,7 @@ fi
 
 echo "📄 Installing Ghostty config..."
 mkdir -p "$HOME/.config/ghostty"
-cp "$DOTFILES_DIR/config/ghostty/config" "$HOME/.config/ghostty/config"
+cp "$DOTFILES_DIR/config/ghostty/"* "$HOME/.config/ghostty/"
 
 echo "📄 Installing Neovim config..."
 mkdir -p "$HOME/.config/nvim/lua/plugins"
