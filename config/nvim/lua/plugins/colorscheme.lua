@@ -1,17 +1,13 @@
 return {
   {
-    "ellisonleao/gruvbox.nvim",
-    opts = {
-      contrast = "hard",
-      overrides = {
-        Normal = { bg = "#201f1e" }, -- match Ghostty Arcoiris background
-      },
-    },
+    "projekt0n/github-nvim-theme",
+    lazy = false,
+    priority = 1000,
   },
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "gruvbox",
+      colorscheme = "github_light_high_contrast",
     },
   },
 }
