@@ -1,18 +1,17 @@
 return {
   {
-    "navarasu/onedark.nvim",
+    "ellisonleao/gruvbox.nvim",
     opts = {
-      style = "darker",
-      colors = {
-        bg0 = "#161719", -- match Ghostty Atom background
-        fg = "#c5c8c6", -- match Ghostty Atom foreground
+      contrast = "hard",
+      overrides = {
+        Normal = { bg = "#201f1e" }, -- match Ghostty Arcoiris background
       },
     },
   },
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "onedark",
+      colorscheme = "gruvbox",
     },
   },
 }
