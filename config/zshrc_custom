@@ -1,4 +1,27 @@
 # Dotfiles custom zsh config
+
+# Detect terminal background (dark/light) via OSC 11.
+# Works over SSH since the query reaches the local terminal.
+# Exported as TERM_BG for use by Neovim and other tools.
+if [ -t 1 ] && [ -z "$TERM_BG" ]; then
+  _oldstty=$(stty -g 2>/dev/null)
+  stty raw -echo min 0 time 1 2>/dev/null
+  printf '\e]11;?\e\\'
+  IFS='' read -r -d '\' _response 2>/dev/null
+  stty "$_oldstty" 2>/dev/null
+  if [[ "$_response" =~ 'rgb:([0-9a-fA-F]+)/([0-9a-fA-F]+)/([0-9a-fA-F]+)' ]]; then
+    _r=$((16#${match[1]:0:2}))
+    _g=$((16#${match[2]:0:2}))
+    _b=$((16#${match[3]:0:2}))
+    _lum=$(( (_r * 299 + _g * 587 + _b * 114) / 1000 ))
+    if (( _lum < 128 )); then
+      export TERM_BG=dark
+    else
+      export TERM_BG=light
+    fi
+  fi
+  unset _oldstty _response _r _g _b _lum
+fi
 if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
   export PATH="$HOME/.local/bin:$PATH"
 fi

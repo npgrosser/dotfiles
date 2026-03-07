@@ -32,24 +32,10 @@ local function github_colorscheme()
   end
 end
 
--- Set background early, before any plugin loads
-local detected = detect_os_appearance()
-if detected then
-  vim.o.background = detected
-else
-  -- OS detection failed (e.g. over SSH with no desktop env).
-  -- Query the terminal directly via OSC 11 - the escape sequence travels
-  -- through SSH to the local terminal, which responds with its bg color.
-  -- Neovim's TUI processes the response and sets 'background' automatically.
-  -- The OptionSet autocmd (registered in plugin config below) will then
-  -- update the colorscheme.
-  local tty = io.open("/dev/tty", "w")
-  if tty then
-    tty:write("\027]11;?\027\\")
-    tty:flush()
-    tty:close()
-  end
-end
+-- Set background early, before any plugin loads.
+-- TERM_BG is set by zshrc_custom via OSC 11 terminal query (works over SSH).
+-- Fall back to OS-level detection for local sessions.
+vim.o.background = vim.env.TERM_BG or detect_os_appearance() or "dark"
 
 return {
   {
