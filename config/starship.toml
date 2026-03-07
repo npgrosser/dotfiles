@@ -1,12 +1,14 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 [username]
-show_always = false
-style_user = "bold"
-format = "[$user]($style) "
+ssh_only = true
+style_user = "bold yellow"
+format = "[$user]($style)@"
 
 [hostname]
-disabled = true
+ssh_only = true
+style = "bold yellow"
+format = "[$hostname]($style) "
 
 [docker_context]
 disabled = true
