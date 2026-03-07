@@ -42,7 +42,7 @@ else
   -- through SSH to the local terminal, which responds with its bg color.
   vim.api.nvim_create_autocmd("TermResponse", {
     callback = function(args)
-      local resp = args.data or vim.v.termresponse or ""
+      local resp = tostring(args.data or vim.v.termresponse or "")
       local r, g, b = resp:match("11;rgb:(%x+)/(%x+)/(%x+)")
       if r and g and b then
         r = tonumber(r:sub(1, 2), 16)
