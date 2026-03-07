@@ -15,10 +15,12 @@ local function detect_system_appearance()
       handle:close()
       if result:match("prefer%-dark") then
         return "dark"
+      elseif result:match("default") or result:match("prefer%-light") then
+        return "light"
       end
     end
   end
-  return "light"
+  return nil
 end
 
 local function github_colorscheme()
@@ -30,7 +32,12 @@ local function github_colorscheme()
 end
 
 -- Set background early, before any plugin loads
-vim.o.background = detect_system_appearance()
+-- If OS-level detection fails (e.g. over SSH), let Neovim's
+-- built-in terminal background detection (OSC 11) handle it
+local detected = detect_system_appearance()
+if detected then
+  vim.o.background = detected
+end
 
 return {
   {
