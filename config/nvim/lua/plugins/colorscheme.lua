@@ -24,32 +24,6 @@ local function detect_os_appearance()
   return nil
 end
 
-local function query_terminal_background()
-  -- Query terminal background color via OSC 11 escape sequence.
-  -- Works over SSH because it queries the local terminal, not the remote OS.
-  local handle = io.popen([[bash -c '
-    exec < /dev/tty
-    oldstty=$(stty -g)
-    stty raw -echo min 0 time 1
-    printf "\033]11;?\033\\"
-    dd bs=1 count=50 2>/dev/null
-    stty "$oldstty"
-  ' 2>/dev/null]])
-  if handle then
-    local result = handle:read("*a")
-    handle:close()
-    local r, g, b = result:match("rgb:(%x+)/(%x+)/(%x+)")
-    if r and g and b then
-      r = tonumber(r:sub(1, 2), 16)
-      g = tonumber(g:sub(1, 2), 16)
-      b = tonumber(b:sub(1, 2), 16)
-      local luminance = 0.299 * r + 0.587 * g + 0.114 * b
-      return luminance < 128 and "dark" or "light"
-    end
-  end
-  return nil
-end
-
 local function github_colorscheme()
   if vim.o.background == "dark" then
     return "github_dark_high_contrast"
@@ -59,11 +33,29 @@ local function github_colorscheme()
 end
 
 -- Set background early, before any plugin loads
--- Try OS-level detection first, fall back to terminal query (OSC 11)
--- which works over SSH since it queries the local terminal
-local detected = detect_os_appearance() or query_terminal_background()
+local detected = detect_os_appearance()
 if detected then
   vim.o.background = detected
+else
+  -- OS detection failed (e.g. over SSH with no desktop env).
+  -- Query the terminal directly via OSC 11 - the escape sequence travels
+  -- through SSH to the local terminal, which responds with its bg color.
+  vim.api.nvim_create_autocmd("TermResponse", {
+    callback = function(args)
+      local resp = args.data or ""
+      local r, g, b = resp:match("11;rgb:(%x+)/(%x+)/(%x+)")
+      if r and g and b then
+        r = tonumber(r:sub(1, 2), 16)
+        g = tonumber(g:sub(1, 2), 16)
+        b = tonumber(b:sub(1, 2), 16)
+        local luminance = 0.299 * r + 0.587 * g + 0.114 * b
+        vim.o.background = luminance < 128 and "dark" or "light"
+        return true -- remove this autocmd
+      end
+    end,
+  })
+  io.write("\027]11;?\027\\")
+  io.flush()
 end
 
 return {
