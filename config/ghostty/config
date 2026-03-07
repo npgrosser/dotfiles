@@ -1,6 +1,8 @@
 config-file = ?config-darwin
 config-file = ?config-linux
 
+term = xterm-256color
+
 font-family = "JetBrainsMono Nerd Font Mono"
 font-style = Medium
 theme = light:"GitHub Light High Contrast",dark:"GitHub Dark High Contrast"
