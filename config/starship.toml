@@ -1,7 +1,7 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 [username]
-ssh_only = true
+show_always = false
 style_user = "bold yellow"
 format = "[$user]($style)@"
 
