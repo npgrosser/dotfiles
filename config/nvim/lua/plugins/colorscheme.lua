@@ -35,7 +35,7 @@ end
 -- Set background early, before any plugin loads.
 -- TERM_BG is set by zshrc_custom via OSC 11 terminal query (works over SSH).
 -- Fall back to OS-level detection for local sessions.
-vim.o.background = vim.env.TERM_BG or detect_os_appearance() or "dark"
+vim.o.background = detect_os_appearance() or vim.env.TERM_BG or "dark"
 
 return {
   {
