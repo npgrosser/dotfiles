@@ -40,22 +40,15 @@ else
   -- OS detection failed (e.g. over SSH with no desktop env).
   -- Query the terminal directly via OSC 11 - the escape sequence travels
   -- through SSH to the local terminal, which responds with its bg color.
-  vim.api.nvim_create_autocmd("TermResponse", {
-    callback = function(args)
-      local resp = tostring(args.data or vim.v.termresponse or "")
-      local r, g, b = resp:match("11;rgb:(%x+)/(%x+)/(%x+)")
-      if r and g and b then
-        r = tonumber(r:sub(1, 2), 16)
-        g = tonumber(g:sub(1, 2), 16)
-        b = tonumber(b:sub(1, 2), 16)
-        local luminance = 0.299 * r + 0.587 * g + 0.114 * b
-        vim.o.background = luminance < 128 and "dark" or "light"
-        return true -- remove this autocmd
-      end
-    end,
-  })
-  io.write("\027]11;?\027\\")
-  io.flush()
+  -- Neovim's TUI processes the response and sets 'background' automatically.
+  -- The OptionSet autocmd (registered in plugin config below) will then
+  -- update the colorscheme.
+  local tty = io.open("/dev/tty", "w")
+  if tty then
+    tty:write("\027]11;?\027\\")
+    tty:flush()
+    tty:close()
+  end
 end
 
 return {
