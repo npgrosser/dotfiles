@@ -70,8 +70,22 @@ dot update                # pull latest dotfiles from GitHub and re-run setup
 dot add list              # show available packages and install status
 dot add rust              # install Rust toolchain
 dot add gcloud            # install Google Cloud CLI
+dot add bw                # install Bitwarden CLI
 dot add cursor            # install Cursor CLI
 dot install-vscode-ext    # install VS Code extensions from config
+```
+
+## bwenv – Bitwarden .env Sync
+
+`bwenv` syncs `.env` files with Bitwarden as secure notes. Requires `bw` (Bitwarden CLI) and `jq`.
+
+The project name is auto-detected from the git remote or directory name. Items are stored as `env/<project>` in Bitwarden.
+
+```bash
+bwenv push [project]    # push local .env to Bitwarden
+bwenv pull [project]    # pull .env from Bitwarden to local
+bwenv diff [project]    # show diff between local and Bitwarden
+bwenv list              # list all stored .env items
 ```
 
 ## tmux Shortcuts
