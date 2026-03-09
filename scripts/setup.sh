@@ -103,6 +103,10 @@ cp "$DOTFILES_DIR/bin/dot" "$LOCAL_BIN/dot"
 cp "$DOTFILES_DIR/bin/.dot.mk" "$LOCAL_BIN/.dot.mk"
 chmod +x "$LOCAL_BIN/dot"
 
+echo "🔧 Installing bwenv..."
+cp "$DOTFILES_DIR/bin/bwenv" "$LOCAL_BIN/bwenv"
+chmod +x "$LOCAL_BIN/bwenv"
+
 if [ ! -f "$ZSHRC" ]; then
   touch "$ZSHRC"
 fi
