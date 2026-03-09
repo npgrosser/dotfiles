@@ -3,9 +3,9 @@
 SHELL       := /bin/bash
 .SHELLFLAGS := -euo pipefail -c
 
-.PHONY: all rust gcloud cursor
+.PHONY: all rust gcloud cursor bw
 
-all: rust gcloud cursor
+all: rust gcloud cursor bw
 
 rust:
 	@if command -v rustc >/dev/null 2>&1 || [ -x "$$HOME/.cargo/bin/rustc" ]; then
@@ -29,4 +29,17 @@ cursor:
 	else
 		echo "cursor: installing..."
 		curl -fsSL https://cursor.com/install | bash
+	fi
+
+bw:
+	@if command -v bw >/dev/null 2>&1 || [ -x "$$HOME/.local/bin/bw" ]; then
+		echo "bw: already installed"
+	else
+		echo "bw: installing..."
+		tmpdir=$$(mktemp -d)
+		curl -fsSL "https://vault.bitwarden.com/download/?app=cli&platform=linux" -o "$$tmpdir/bw.zip"
+		unzip -o "$$tmpdir/bw.zip" -d "$$tmpdir"
+		install -m 755 "$$tmpdir/bw" "$$HOME/.local/bin/bw"
+		rm -rf "$$tmpdir"
+		echo "bw: installed to ~/.local/bin/bw"
 	fi

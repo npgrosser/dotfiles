@@ -9,7 +9,7 @@ Usage: dot <command> [args...]
 
 Commands:
   update                 Update dotfiles from GitHub to the latest version
-  add <package>          Install additional optional tools (rust, gcloud, cursor)
+  add <package>          Install additional optional tools (rust, gcloud, cursor, bw)
   install-vscode-ext     Install VS Code extensions from config
   help                   Show this help message
 HELP
@@ -40,6 +40,7 @@ Packages:
   rust      Rust toolchain (via rustup)
   gcloud    Google Cloud CLI
   cursor    Cursor CLI
+  bw        Bitwarden CLI
 HELP
   }
 
@@ -48,11 +49,12 @@ HELP
       rust)   command -v rustc  >/dev/null 2>&1 || [ -x "$HOME/.cargo/bin/rustc" ] ;;
       gcloud) command -v gcloud >/dev/null 2>&1 || [ -d "$HOME/google-cloud-sdk" ] ;;
       cursor) command -v cursor >/dev/null 2>&1 || [ -x "$HOME/.local/bin/cursor" ] ;;
+      bw)     command -v bw     >/dev/null 2>&1 || [ -x "$HOME/.local/bin/bw" ] ;;
     esac
   }
 
   list_packages() {
-    for pkg in rust gcloud cursor; do
+    for pkg in rust gcloud cursor bw; do
       if _have "$pkg"; then
         printf "%-8s installed\n" "$pkg:"
       else
