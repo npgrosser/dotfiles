@@ -361,7 +361,7 @@ elif command -v curl >/dev/null 2>&1; then
   _commit_json="$(curl -fsSL "https://api.github.com/repos/${_dotfiles_repo}/commits/${_dotfiles_ref}" 2>/dev/null || true)"
   if [ -n "$_commit_json" ]; then
     _sha="$(echo "$_commit_json" | jq -r '.sha[:7]' 2>/dev/null || true)"
-    _date="$(echo "$_commit_json" | jq -r '.commit.committer.date[:10]' 2>/dev/null || true)"
+    _date="$(echo "$_commit_json" | jq -r '.commit.committer.date[:19] | sub("T"; " ")' 2>/dev/null || true)"
     [ -n "$_sha" ] && [ -n "$_date" ] && _version_info="$_sha ($_date)"
   fi
 fi
