@@ -209,8 +209,13 @@ else
 fi
 
 echo "📄 Installing Ghostty config..."
-mkdir -p "$HOME/.config/ghostty"
-cp "$DOTFILES_DIR/config/ghostty/"* "$HOME/.config/ghostty/"
+if [ "$(uname)" = "Darwin" ]; then
+  GHOSTTY_CONFIG_DIR="$HOME/Library/Application Support/com.mitchellh.ghostty"
+else
+  GHOSTTY_CONFIG_DIR="$HOME/.config/ghostty"
+fi
+mkdir -p "$GHOSTTY_CONFIG_DIR"
+cp "$DOTFILES_DIR/config/ghostty/"* "$GHOSTTY_CONFIG_DIR/"
 
 echo "📄 Installing Neovim config..."
 mkdir -p "$HOME/.config/nvim/lua/plugins"
