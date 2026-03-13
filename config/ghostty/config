@@ -1,5 +1,4 @@
-config-file = ?config-darwin
-config-file = ?config-linux
+config-file = ?config-platform
 
 term = xterm-256color
 
