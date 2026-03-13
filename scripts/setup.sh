@@ -4,9 +4,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 ZSHRC="$HOME/.zshrc"
-ZSHRC_CUSTOM="$HOME/.zshrc_custom"
+ZSHRC_DOTFILES="$HOME/.zshrc_dotfiles"
 LOCAL_BIN="$HOME/.local/bin"
-CUSTOM_SOURCE_LINE='[ -f "$HOME/.zshrc_custom" ] && source "$HOME/.zshrc_custom"'
+DOTFILES_SOURCE_LINE='[ -f "$HOME/.zshrc_dotfiles" ] && source "$HOME/.zshrc_dotfiles"'
 TMUX_CONF="$HOME/.tmux.conf"
 GITCONFIG_DOTFILES="$HOME/.gitconfig_dotfiles"
 OS="$(uname -s)"
@@ -94,8 +94,8 @@ cp "$DOTFILES_DIR/config/starship.toml" "$HOME/.config/starship.toml"
 
 # --- 2. Install custom zsh config and helper commands ---
 
-echo "📄 Installing ~/.zshrc_custom..."
-cp "$DOTFILES_DIR/config/zshrc_custom" "$ZSHRC_CUSTOM"
+echo "📄 Installing ~/.zshrc_dotfiles..."
+cp "$DOTFILES_DIR/config/zshrc_dotfiles" "$ZSHRC_DOTFILES"
 
 echo "🔧 Installing dot..."
 mkdir -p "$LOCAL_BIN"
@@ -111,9 +111,14 @@ if [ ! -f "$ZSHRC" ]; then
   touch "$ZSHRC"
 fi
 
-if ! grep -Fqx "$CUSTOM_SOURCE_LINE" "$ZSHRC"; then
-  echo "🔗 Linking ~/.zshrc_custom from ~/.zshrc..."
-  printf '\n# Dotfiles custom config\n%s\n' "$CUSTOM_SOURCE_LINE" >> "$ZSHRC"
+if ! grep -Fqx "$DOTFILES_SOURCE_LINE" "$ZSHRC"; then
+  echo "🔗 Linking ~/.zshrc_dotfiles from ~/.zshrc..."
+  # Remove old zshrc_custom source line if present
+  if grep -q 'zshrc_custom' "$ZSHRC"; then
+    _sed_i '/zshrc_custom/d' "$ZSHRC"
+    _sed_i '/# Dotfiles custom config/d' "$ZSHRC"
+  fi
+  printf '\n# Dotfiles shared config\n%s\n' "$DOTFILES_SOURCE_LINE" >> "$ZSHRC"
 fi
 
 # --- 3. Install git config (via include, preserves user.name/email) ---
