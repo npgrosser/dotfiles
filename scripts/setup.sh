@@ -235,6 +235,15 @@ sed "s|__HOME__|$HOME|g" "$DOTFILES_DIR/config/zellij/config.kdl" > "$HOME/.conf
 cp "$DOTFILES_DIR/config/zellij/copy.sh" "$HOME/.config/zellij/copy.sh"
 chmod +x "$HOME/.config/zellij/copy.sh"
 
+echo "📄 Installing Zed keymap..."
+if [ "$(uname)" = "Darwin" ]; then
+  ZED_CONFIG_DIR="$HOME/.config/zed"
+else
+  ZED_CONFIG_DIR="$HOME/.config/zed"
+fi
+mkdir -p "$ZED_CONFIG_DIR"
+cp "$DOTFILES_DIR/config/zed/keymap.json" "$ZED_CONFIG_DIR/keymap.json"
+
 echo "📄 Installing ~/.tmux.conf..."
 cp "$DOTFILES_DIR/config/tmux.conf" "$TMUX_CONF"
 

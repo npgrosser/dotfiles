@@ -1,0 +1,13 @@
+[
+  {
+    "context": "Terminal",
+    "bindings": {
+      "alt-d": "pane::SplitRight",
+      "alt-shift-d": "pane::SplitDown",
+      "alt-shift-left": ["workspace::ActivatePaneInDirection", "Left"],
+      "alt-shift-right": ["workspace::ActivatePaneInDirection", "Right"],
+      "alt-shift-up": ["workspace::ActivatePaneInDirection", "Up"],
+      "alt-shift-down": ["workspace::ActivatePaneInDirection", "Down"]
+    }
+  }
+]
