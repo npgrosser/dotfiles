@@ -228,7 +228,7 @@ cp "$GHOSTTY_PLATFORM_CONFIG" "$GHOSTTY_CONFIG_DIR/config-platform"
 echo "📄 Installing Neovim config..."
 mkdir -p "$HOME/.config/nvim/lua/plugins"
 cp "$DOTFILES_DIR/config/nvim/lua/plugins/colorscheme.lua" "$HOME/.config/nvim/lua/plugins/colorscheme.lua"
-cp "$DOTFILES_DIR/config/nvim/lua/plugins/neo-tree.lua" "$HOME/.config/nvim/lua/plugins/neo-tree.lua"
+cp "$DOTFILES_DIR/config/nvim/lua/plugins/snacks.lua" "$HOME/.config/nvim/lua/plugins/snacks.lua"
 
 echo "📄 Installing Zellij config..."
 mkdir -p "$HOME/.config/zellij"
