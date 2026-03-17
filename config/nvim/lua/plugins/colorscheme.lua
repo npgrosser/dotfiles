@@ -24,9 +24,9 @@ local function detect_os_appearance()
   return nil
 end
 
-local function github_colorscheme()
+local function pick_colorscheme()
   if vim.o.background == "dark" then
-    return "github_dark_high_contrast"
+    return "onedark"
   else
     return "github_light_high_contrast"
   end
@@ -38,23 +38,52 @@ end
 vim.o.background = detect_os_appearance() or vim.env.TERM_BG or "dark"
 
 return {
+  -- One Dark for dark mode — tuned to match Hydra terminal's default palette
+  {
+    "navarasu/onedark.nvim",
+    lazy = false,
+    priority = 1000,
+    opts = {
+      style = "darker",
+      colors = {
+        bg0 = "#181818", -- main background (exact Hydra match)
+        bg1 = "#1f1f1f", -- lighter bg (statusline, etc.)
+        bg2 = "#252525", -- selection, visual
+        bg3 = "#363636", -- borders, indent guides
+        bg_d = "#0f0f0f", -- darker bg (matches Hydra tab bar)
+      },
+    },
+    config = function(_, opts)
+      require("onedark").setup(opts)
+      if vim.o.background == "dark" then
+        require("onedark").load()
+      end
+    end,
+  },
+  -- GitHub theme for light mode
   {
     "projekt0n/github-nvim-theme",
     lazy = false,
     priority = 1000,
     config = function()
-      vim.api.nvim_create_autocmd("OptionSet", {
-        pattern = "background",
-        callback = function()
-          vim.cmd.colorscheme(github_colorscheme())
-        end,
-      })
+      if vim.o.background == "light" then
+        vim.cmd.colorscheme("github_light_high_contrast")
+      end
     end,
   },
+  -- Switch colorscheme when background changes
   {
     "LazyVim/LazyVim",
     opts = function()
-      return { colorscheme = github_colorscheme() }
+      return { colorscheme = pick_colorscheme() }
+    end,
+    init = function()
+      vim.api.nvim_create_autocmd("OptionSet", {
+        pattern = "background",
+        callback = function()
+          vim.cmd.colorscheme(pick_colorscheme())
+        end,
+      })
     end,
   },
 }
