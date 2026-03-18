@@ -248,9 +248,17 @@ cp "$DOTFILES_DIR/config/zed/keymap.json" "$ZED_CONFIG_DIR/keymap.json"
 echo "📄 Installing ~/.tmux.conf..."
 cp "$DOTFILES_DIR/config/tmux.conf" "$TMUX_CONF"
 
-echo "🤖 Installing Claude Code settings..."
+echo "🤖 Configuring Claude Code settings..."
+CLAUDE_SETTINGS="$HOME/.claude/settings.json"
+CLAUDE_DEFAULTS="$DOTFILES_DIR/config/claude/settings.json"
 mkdir -p "$HOME/.claude"
-cp "$DOTFILES_DIR/config/claude/settings.json" "$HOME/.claude/settings.json"
+if [ ! -f "$CLAUDE_SETTINGS" ]; then
+  cp "$CLAUDE_DEFAULTS" "$CLAUDE_SETTINGS"
+else
+  # Deep-merge: dotfiles defaults + existing settings (existing wins)
+  jq -s '.[0] * .[1]' "$CLAUDE_DEFAULTS" "$CLAUDE_SETTINGS" > "$CLAUDE_SETTINGS.tmp" \
+    && mv "$CLAUDE_SETTINGS.tmp" "$CLAUDE_SETTINGS"
+fi
 
 # --- 5. Install VS Code extensions list ---
 
@@ -336,20 +344,7 @@ if ! grep -q 'starship init zsh' "$ZSHRC"; then
   printf '\n# Starship prompt\neval "$(starship init zsh)"\n' >> "$ZSHRC"
 fi
 
-# --- 9. Configure Claude Code ---
-
-CLAUDE_SETTINGS="$HOME/.claude/settings.json"
-if [ ! -f "$CLAUDE_SETTINGS" ]; then
-  echo "🤖 Creating Claude Code settings..."
-  mkdir -p "$HOME/.claude"
-  echo '{"includeCoAuthoredBy": false}' | jq . > "$CLAUDE_SETTINGS"
-elif ! jq -e 'has("includeCoAuthoredBy")' "$CLAUDE_SETTINGS" >/dev/null 2>&1; then
-  echo "🤖 Configuring Claude Code (disabling co-authored-by)..."
-  jq '. + {"includeCoAuthoredBy": false}' "$CLAUDE_SETTINGS" > "$CLAUDE_SETTINGS.tmp" \
-    && mv "$CLAUDE_SETTINGS.tmp" "$CLAUDE_SETTINGS"
-fi
-
-# --- 10. Warn if default shell is not zsh ---
+# --- 9. Warn if default shell is not zsh ---
 
 LOGIN_SHELL="$(getent passwd "$(id -un)" 2>/dev/null | cut -d: -f7 || true)"
 if [ -z "$LOGIN_SHELL" ]; then
