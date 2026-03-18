@@ -1,0 +1,45 @@
+{
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "allow": [
+      "Bash(python3:*)",
+      "Read(//tmp/**)",
+      "Read(//private/tmp/**)"
+    ]
+  },
+  "model": "claude-opus-4-6",
+  "hooks": {
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bd prime"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bd prime"
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "pyright-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "gitlab@claude-plugins-official": true
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "statusLine": {
+    "type": "command",
+    "command": "input=$(cat); cwd=$(echo \"$input\" | jq -r '.workspace.current_dir'); session_name=$(echo \"$input\" | jq -r '.session_name // empty'); cost_usd=$(echo \"$input\" | jq -r '.cost.total_cost_usd // empty'); dir_name=$(basename \"$cwd\"); if git -C \"$cwd\" rev-parse --git-dir >/dev/null 2>&1; then branch=$(git -C \"$cwd\" --no-optional-locks branch --show-current 2>/dev/null); [ -n \"$branch\" ] && git_info=\" on $(printf '\\033[35m')$branch$(printf '\\033[0m')\"; fi; status=\"$(printf '\\033[36m')$dir_name$(printf '\\033[0m')$git_info\"; [ -n \"$cost_usd\" ] && cost_fmt=$(printf '$%.2f' \"$cost_usd\") && status=\"$status $(printf '\\033[2m')$cost_fmt$(printf '\\033[0m')\"; [ -n \"$session_name\" ] && status=\"[$session_name] $status\"; echo \"$status\""
+  }
+}

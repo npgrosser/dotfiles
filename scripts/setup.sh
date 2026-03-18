@@ -248,6 +248,10 @@ cp "$DOTFILES_DIR/config/zed/keymap.json" "$ZED_CONFIG_DIR/keymap.json"
 echo "📄 Installing ~/.tmux.conf..."
 cp "$DOTFILES_DIR/config/tmux.conf" "$TMUX_CONF"
 
+echo "🤖 Installing Claude Code settings..."
+mkdir -p "$HOME/.claude"
+cp "$DOTFILES_DIR/config/claude/settings.json" "$HOME/.claude/settings.json"
+
 # --- 5. Install VS Code extensions list ---
 
 echo "💻 Installing VS Code extensions list..."
