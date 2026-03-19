@@ -41,6 +41,37 @@ alias grep='grep --color=auto'
 alias yolo='claude --dangerously-skip-permissions'
 alias cld='claude --system-prompt "You are a general-purpose terminal and system assistant. Do not proactively explore the current directory or treat it as a project. Just help with whatever I ask."'
 
+# open command (macOS-like wrapper around xdg-open)
+if [[ "$(uname)" != "Darwin" ]]; then
+  open() {
+    local app="" reveal=0 textedit=0
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        -a) app="$2"; shift 2 ;;
+        -R) reveal=1; shift ;;
+        -t) textedit=1; shift ;;
+        *) break ;;
+      esac
+    done
+    if (( textedit )); then
+      ${EDITOR:-vi} "$@"
+    elif (( reveal )); then
+      local dir
+      for f in "$@"; do
+        dir="$(dirname "$(realpath "$f")")"
+        xdg-open "$dir" &>/dev/null &
+      done
+    elif [[ -n "$app" ]]; then
+      "$app" "$@" &>/dev/null &
+    else
+      local target
+      for target in "${@:-.}"; do
+        xdg-open "$target" &>/dev/null &
+      done
+    fi
+  }
+fi
+
 # Use eza/bat if available
 command -v eza >/dev/null 2>&1 && alias ls='eza --icons'
 if command -v bat >/dev/null 2>&1; then
