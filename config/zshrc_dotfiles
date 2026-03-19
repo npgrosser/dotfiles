@@ -79,6 +79,21 @@ if command -v bat >/dev/null 2>&1; then
   alias cat='bat'
 fi
 
+# dot wrapper: intercept commands that need to affect the current shell
+dot() {
+  case "${1:-}" in
+    reload)
+      exec zsh
+      ;;
+    update)
+      command dot "$@" && exec zsh
+      ;;
+    *)
+      command dot "$@"
+      ;;
+  esac
+}
+
 # z - jump around (https://github.com/rupa/z)
 [ -f "$HOME/.local/share/z/z.sh" ] && . "$HOME/.local/share/z/z.sh"
 

@@ -9,6 +9,7 @@ Usage: dot <command> [args...]
 
 Commands:
   update                 Update dotfiles from GitHub to the latest version
+  reload                 Reload shell configuration (exec zsh)
   add <package>          Install additional optional tools (rust, gcloud, cursor, bw)
   install-vscode-ext     Install VS Code extensions from config
   help                   Show this help message
