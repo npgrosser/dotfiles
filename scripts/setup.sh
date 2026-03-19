@@ -379,6 +379,8 @@ echo "✅ Dotfiles installed!"
 if [ -n "$_version_info" ]; then
   echo "   Version: $_version_info"
 fi
-if [ -z "${DOT_AUTO_RELOAD:-}" ]; then
+if [ -n "${DOT_AUTO_RELOAD:-}" ]; then
+  echo "   Shell will reload automatically."
+else
   echo "   Run 'dot reload' or restart your shell to apply changes."
 fi
