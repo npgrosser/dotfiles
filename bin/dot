@@ -124,6 +124,7 @@ cmd_install_vscode_ext() {
 
 case "$COMMAND" in
   update)                  cmd_update "$@" ;;
+  reload)                  exec "${SHELL:-zsh}" ;;
   add)                     cmd_add "$@" ;;
   install-vscode-ext)      cmd_install_vscode_ext "$@" ;;
   help|-h|--help)          usage ;;
