@@ -379,4 +379,6 @@ echo "✅ Dotfiles installed!"
 if [ -n "$_version_info" ]; then
   echo "   Version: $_version_info"
 fi
-echo "   Restart your shell or run: exec zsh to make sure all changes take effect."
+if [ -z "${DOT_AUTO_RELOAD:-}" ]; then
+  echo "   Run 'dot reload' or restart your shell to apply changes."
+fi

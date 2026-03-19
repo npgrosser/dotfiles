@@ -86,7 +86,7 @@ dot() {
       exec zsh
       ;;
     update)
-      command dot "$@" && exec zsh
+      DOT_AUTO_RELOAD=1 command dot "$@" && exec zsh
       ;;
     *)
       command dot "$@"
