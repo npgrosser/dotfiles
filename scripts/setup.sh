@@ -325,13 +325,23 @@ fi
 
 # --- 8. Configure .zshrc ---
 
-if grep -q 'plugins=(git)' "$ZSHRC"; then
-  echo "⚙️  Configuring zsh plugins..."
-  _sed_i 's/plugins=(git)/plugins=(git zsh-autosuggestions zsh-syntax-highlighting sudo)/' "$ZSHRC"
-fi
+_desired_plugins="git zsh-autosuggestions zsh-syntax-highlighting sudo"
 
-if ! grep -q 'zsh-syntax-highlighting' "$ZSHRC"; then
-  _sed_i 's/plugins=(\([^)]*\))/plugins=(\1 zsh-syntax-highlighting)/' "$ZSHRC"
+if grep -q 'plugins=(' "$ZSHRC"; then
+  # Replace existing plugins line with desired set
+  if ! grep -q "zsh-autosuggestions" "$ZSHRC"; then
+    echo "⚙️  Configuring zsh plugins..."
+    _sed_i "s/plugins=([^)]*)/plugins=($_desired_plugins)/" "$ZSHRC"
+  fi
+else
+  # No plugins line at all — add one before the oh-my-zsh source line, or at the end
+  echo "⚙️  Adding zsh plugins..."
+  if grep -q 'oh-my-zsh.sh' "$ZSHRC"; then
+    _sed_i "/oh-my-zsh.sh/i\\
+plugins=($_desired_plugins)" "$ZSHRC"
+  else
+    printf '\nplugins=(%s)\n' "$_desired_plugins" >> "$ZSHRC"
+  fi
 fi
 
 if ! grep -q 'fzf.zsh' "$ZSHRC"; then
