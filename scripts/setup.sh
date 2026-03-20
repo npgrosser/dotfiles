@@ -344,6 +344,19 @@ plugins=($_desired_plugins)" "$ZSHRC"
   fi
 fi
 
+# Ensure oh-my-zsh is sourced (may be missing if --keep-zshrc kept a pre-existing .zshrc)
+if ! grep -q 'oh-my-zsh.sh' "$ZSHRC"; then
+  echo "🔗 Adding oh-my-zsh source to .zshrc..."
+  # Insert after plugins line so plugins are set before oh-my-zsh loads them
+  if grep -q 'plugins=(' "$ZSHRC"; then
+    _sed_i "/plugins=(/a\\
+export ZSH=\"\$HOME/.oh-my-zsh\"\\
+source \"\$ZSH/oh-my-zsh.sh\"" "$ZSHRC"
+  else
+    printf '\nexport ZSH="$HOME/.oh-my-zsh"\nsource "$ZSH/oh-my-zsh.sh"\n' >> "$ZSHRC"
+  fi
+fi
+
 if ! grep -q 'fzf.zsh' "$ZSHRC"; then
   echo "🔗 Adding fzf to .zshrc..."
   printf '\n# fzf key bindings and completion\n[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh\n' >> "$ZSHRC"
