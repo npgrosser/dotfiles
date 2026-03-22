@@ -33,7 +33,8 @@ export VISUAL="vim"
 # Shell aliases
 alias t="tmux"
 alias zj="zellij"
-alias ll='ls -alF'
+alias l='ls'
+alias ll='ls -lah'
 alias la='ls -A'
 alias ..='cd ..'
 alias ...='cd ../..'
