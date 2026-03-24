@@ -10,7 +10,7 @@ Usage: dot <command> [args...]
 Commands:
   update                 Update dotfiles from GitHub to the latest version
   reload                 Reload shell configuration (exec zsh)
-  add <package>          Install additional optional tools (rust, gcloud, cursor, bw)
+  add <package>          Install additional optional tools (rust, gcloud, cursor, bw, direnv)
   install-vscode-ext     Install VS Code extensions from config
   help                   Show this help message
 HELP
@@ -42,6 +42,7 @@ Packages:
   gcloud    Google Cloud CLI
   cursor    Cursor CLI
   bw        Bitwarden CLI
+  direnv    direnv (per-directory env vars)
 HELP
   }
 
@@ -51,11 +52,12 @@ HELP
       gcloud) command -v gcloud >/dev/null 2>&1 || [ -d "$HOME/google-cloud-sdk" ] ;;
       cursor) command -v cursor >/dev/null 2>&1 || [ -x "$HOME/.local/bin/cursor" ] ;;
       bw)     command -v bw     >/dev/null 2>&1 || [ -x "$HOME/.local/bin/bw" ] ;;
+      direnv) command -v direnv >/dev/null 2>&1 ;;
     esac
   }
 
   list_packages() {
-    for pkg in rust gcloud cursor bw; do
+    for pkg in rust gcloud cursor bw direnv; do
       if _have "$pkg"; then
         printf "%-8s installed\n" "$pkg:"
       else

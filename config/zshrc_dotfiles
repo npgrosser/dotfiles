@@ -102,5 +102,8 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
 
+# direnv hook
+command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
+
 # Machine-specific overrides (not managed by dotfiles)
 [ -f "$HOME/.zshrc_local" ] && source "$HOME/.zshrc_local"

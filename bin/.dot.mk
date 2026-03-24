@@ -3,9 +3,9 @@
 SHELL       := /bin/bash
 .SHELLFLAGS := -euo pipefail -c
 
-.PHONY: all rust gcloud cursor bw
+.PHONY: all rust gcloud cursor bw direnv
 
-all: rust gcloud cursor bw
+all: rust gcloud cursor bw direnv
 
 rust:
 	@if command -v rustc >/dev/null 2>&1 || [ -x "$$HOME/.cargo/bin/rustc" ]; then
@@ -42,4 +42,14 @@ bw:
 		install -m 755 "$$tmpdir/bw" "$$HOME/.local/bin/bw"
 		rm -rf "$$tmpdir"
 		echo "bw: installed to ~/.local/bin/bw"
+	fi
+
+direnv:
+	@if command -v direnv >/dev/null 2>&1; then
+		echo "direnv: already installed"
+	else
+		echo "direnv: installing..."
+		export bin_path="$$HOME/.local/bin"
+		curl -sfL https://direnv.net/install.sh | bash
+		echo "direnv: installed"
 	fi
