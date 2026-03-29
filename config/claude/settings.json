@@ -8,14 +8,49 @@
     ]
   },
   "model": "claude-opus-4-6",
+  "hooks": {
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bd prime"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bd prime"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash -c 'plugin_dir=$(ls -d \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}\"/plugins/cache/claude-hud/claude-hud/*/ 2>/dev/null | awk -F/ '\"'\"'{ print $(NF-1) \"\\t\" $(0) }'\"'\"' | sort -t. -k1,1n -k2,2n -k3,3n -k4,4n | tail -1 | cut -f2-); rt=$(command -v bun 2>/dev/null || command -v node 2>/dev/null) || exit 1; src=dist/index.js; case \"$(basename \"$rt\")\" in bun) src=src/index.ts;; esac; exec \"$rt\" \"${plugin_dir}${src}\"'"
+  },
   "enabledPlugins": {
     "pyright-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
-    "gitlab@claude-plugins-official": true
+    "gitlab@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "claude-hud@claude-hud": true
   },
-  "skipDangerousModePermissionPrompt": true,
-  "statusLine": {
-    "type": "command",
-    "command": "input=$(cat); cwd=$(echo \"$input\" | jq -r '.workspace.current_dir'); session_name=$(echo \"$input\" | jq -r '.session_name // empty'); cost_usd=$(echo \"$input\" | jq -r '.cost.total_cost_usd // empty'); dir_name=$(basename \"$cwd\"); if git -C \"$cwd\" rev-parse --git-dir >/dev/null 2>&1; then branch=$(git -C \"$cwd\" --no-optional-locks branch --show-current 2>/dev/null); [ -n \"$branch\" ] && git_info=\" on $(printf '\\033[35m')$branch$(printf '\\033[0m')\"; fi; status=\"$(printf '\\033[36m')$dir_name$(printf '\\033[0m')$git_info\"; model=$(echo \"$input\" | jq -r '.model // empty'); [ -n \"$cost_usd\" ] && cost_fmt=$(printf '$%.2f' \"$cost_usd\") && status=\"$status $(printf '\\033[2m')$cost_fmt$(printf '\\033[0m')\"; [ -n \"$model\" ] && status=\"$status $(printf '\\033[2m')$model$(printf '\\033[0m')\"; [ -n \"$session_name\" ] && status=\"[$session_name] $status\"; echo \"$status\""
-  }
+  "extraKnownMarketplaces": {
+    "claude-hud": {
+      "source": {
+        "source": "github",
+        "repo": "jarrodwatts/claude-hud"
+      }
+    }
+  },
+  "effortLevel": "high",
+  "skipDangerousModePermissionPrompt": true
 }
