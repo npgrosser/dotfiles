@@ -260,6 +260,9 @@ else
     && mv "$CLAUDE_SETTINGS.tmp" "$CLAUDE_SETTINGS"
 fi
 
+mkdir -p "$HOME/.claude/plugins/claude-hud"
+cp "$DOTFILES_DIR/config/claude/plugins/claude-hud/config.json" "$HOME/.claude/plugins/claude-hud/config.json"
+
 # --- 5. Install VS Code extensions list ---
 
 echo "💻 Installing VS Code extensions list..."
