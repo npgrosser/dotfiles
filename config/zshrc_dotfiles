@@ -42,10 +42,12 @@ alias grep='grep --color=auto'
 alias yolo='claude --dangerously-skip-permissions'
 alias cld='claude --system-prompt "You are a general-purpose terminal and system assistant. Do not proactively explore the current directory or treat it as a project. Just help with whatever I ask."'
 
-# open command (macOS-like wrapper around xdg-open)
+# open command (macOS-like wrapper for Linux and WSL)
 if [[ "$(uname)" != "Darwin" ]]; then
   open() {
-    local app="" reveal=0 textedit=0
+    local app="" reveal=0 textedit=0 is_wsl=0
+    [[ -n "${WSL_INTEROP:-}" || "$(uname -r)" == *[Mm]icrosoft* ]] && is_wsl=1
+
     while [[ $# -gt 0 ]]; do
       case "$1" in
         -a) app="$2"; shift 2 ;;
@@ -54,20 +56,53 @@ if [[ "$(uname)" != "Darwin" ]]; then
         *) break ;;
       esac
     done
+
+    if (( ! textedit )) && [[ -z "$app" ]]; then
+      if (( is_wsl )); then
+        command -v explorer.exe >/dev/null 2>&1 || {
+          print -u2 "open: explorer.exe not found; is WSL interoperability enabled?"
+          return 127
+        }
+        command -v wslpath >/dev/null 2>&1 || {
+          print -u2 "open: wslpath not found"
+          return 127
+        }
+      elif ! command -v xdg-open >/dev/null 2>&1; then
+        print -u2 "open: xdg-open not found; install xdg-utils"
+        return 127
+      fi
+    fi
+
     if (( textedit )); then
       ${EDITOR:-vi} "$@"
     elif (( reveal )); then
-      local dir
+      local dir resolved windows_target
       for f in "$@"; do
-        dir="$(dirname "$(realpath "$f")")"
-        xdg-open "$dir" &>/dev/null &
+        resolved="$(realpath -- "$f")" || return 1
+        if (( is_wsl )); then
+          windows_target="$(wslpath -w "$resolved")" || return 1
+          explorer.exe "/select,$windows_target" &>/dev/null &!
+        else
+          dir="$(dirname "$resolved")"
+          xdg-open "$dir" &>/dev/null &!
+        fi
       done
     elif [[ -n "$app" ]]; then
-      "$app" "$@" &>/dev/null &
+      "$app" "$@" &>/dev/null &!
     else
-      local target
+      local target resolved windows_target
       for target in "${@:-.}"; do
-        xdg-open "$target" &>/dev/null &
+        if (( is_wsl )); then
+          if [[ "$target" == *://* || "$target" == mailto:* ]]; then
+            windows_target="$target"
+          else
+            resolved="$(realpath -m -- "$target")" || return 1
+            windows_target="$(wslpath -w "$resolved")" || return 1
+          fi
+          explorer.exe "$windows_target" &>/dev/null &!
+        else
+          xdg-open "$target" &>/dev/null &!
+        fi
       done
     fi
   }
