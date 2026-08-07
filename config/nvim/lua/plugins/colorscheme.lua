@@ -33,7 +33,7 @@ local function pick_colorscheme()
 end
 
 -- Set background early, before any plugin loads.
--- TERM_BG is set by zshrc_custom via OSC 11 terminal query (works over SSH).
+-- TERM_BG is set by zshrc_dotfiles via an OSC 11 terminal query.
 -- Fall back to OS-level detection for local sessions.
 vim.o.background = detect_os_appearance() or vim.env.TERM_BG or "dark"
 

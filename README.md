@@ -39,11 +39,11 @@ curl -fsSL https://raw.githubusercontent.com/npgrosser/dotfiles/refs/heads/main/
 | Claude CLI | Anthropic Claude | Installer script |
 | GitHub CLI | GitHub from the terminal | Binary download / brew |
 | uv | Python package manager | Installer script |
-| Node.js | JavaScript runtime (via nvm) | nvm |
+| Node.js | JavaScript runtime (via fnm) | fnm |
 
 ### Config
 - Starship `tokyo-night` preset
-- `~/.zshrc_custom` with aliases and PATH setup
+- `~/.zshrc_dotfiles` with aliases and PATH setup
 - `~/.tmux.conf` with custom keybindings
 - `~/.gitconfig_dotfiles` (included via `~/.gitconfig`)
 
@@ -54,7 +54,7 @@ On Linux, zsh is installed automatically via the system package manager (dnf, ap
 
 - `install.sh` → bootstrap entrypoint (local or remote)
 - `scripts/setup.sh` → main idempotent setup logic
-- `config/zshrc_custom` → user zsh custom config
+- `config/zshrc_dotfiles` → shared zsh config
 - `bin/dot` → CLI helper (`dot add`, `dot update`, `dot install-vscode-ext`)
 
 After install, restart your shell or run:

@@ -2,27 +2,41 @@
 # For machine-specific config, use ~/.zshrc_local
 
 # Detect terminal background (dark/light) via OSC 11.
-# Works over SSH since the query reaches the local terminal.
-# Exported as TERM_BG for use by Neovim and other tools.
-if [ -t 1 ] && [ -z "$TERM_BG" ]; then
-  _oldstty=$(stty -g 2>/dev/null)
-  stty raw -echo min 0 time 1 2>/dev/null
-  printf '\e]11;?\e\\'
-  IFS='' read -r -d '\' _response 2>/dev/null
-  stty "$_oldstty" 2>/dev/null
-  if [[ "$_response" =~ 'rgb:([0-9a-fA-F]+)/([0-9a-fA-F]+)/([0-9a-fA-F]+)' ]]; then
-    _r=$((16#${match[1]:0:2}))
-    _g=$((16#${match[2]:0:2}))
-    _b=$((16#${match[3]:0:2}))
-    _lum=$(( (_r * 299 + _g * 587 + _b * 114) / 1000 ))
-    if (( _lum < 128 )); then
+# sysread gives terminals that do not support the query a hard 150 ms timeout.
+_dotfiles_detect_terminal_background() {
+  [[ -t 0 && -t 1 ]] || return 0
+  zmodload zsh/system 2>/dev/null || return 0
+
+  local oldstty response
+  local -a match
+  oldstty=$(stty -g 2>/dev/null) || return 0
+
+  {
+    if stty raw -echo 2>/dev/null; then
+      printf '\e]11;?\e\\'
+      sysread -t 0.15 -s 64 response 2>/dev/null
+    fi
+  } always {
+    stty "$oldstty" 2>/dev/null
+  }
+
+  if [[ "$response" =~ 'rgb:([0-9a-fA-F]+)/([0-9a-fA-F]+)/([0-9a-fA-F]+)' ]]; then
+    local r=$((16#${match[1]:0:2}))
+    local g=$((16#${match[2]:0:2}))
+    local b=$((16#${match[3]:0:2}))
+    local lum=$(( (r * 299 + g * 587 + b * 114) / 1000 ))
+    if (( lum < 128 )); then
       export TERM_BG=dark
     else
       export TERM_BG=light
     fi
   fi
-  unset _oldstty _response _r _g _b _lum
+}
+
+if [[ -z ${TERM_BG:-} ]]; then
+  _dotfiles_detect_terminal_background
 fi
+unfunction _dotfiles_detect_terminal_background
 if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
   export PATH="$HOME/.local/bin:$PATH"
 fi
@@ -133,12 +147,31 @@ dot() {
 # z - jump around (https://github.com/rupa/z)
 [ -f "$HOME/.local/share/z/z.sh" ] && . "$HOME/.local/share/z/z.sh"
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+# fnm - fast Node.js version manager
+_fnm_dir="${XDG_DATA_HOME:-$HOME/.local/share}/fnm"
+if [[ -x "$_fnm_dir/fnm" && ":$PATH:" != *":$_fnm_dir:"* ]]; then
+  export PATH="$_fnm_dir:$PATH"
+fi
+if command -v fnm >/dev/null 2>&1; then
+  eval "$(fnm env --use-on-cd --shell zsh)"
+fi
+unset _fnm_dir
 
-# direnv hook
-command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
+# direnv hook. Check the locations supported by this setup directly; searching
+# the full PATH is noticeably slow in WSL when it contains Windows mounts.
+_direnv_bin=""
+for _candidate in \
+  "$HOME/.local/bin/direnv" \
+  /opt/homebrew/bin/direnv \
+  /usr/local/bin/direnv \
+  /usr/bin/direnv; do
+  if [[ -x "$_candidate" ]]; then
+    _direnv_bin="$_candidate"
+    break
+  fi
+done
+[[ -n "$_direnv_bin" ]] && eval "$("$_direnv_bin" hook zsh)"
+unset _direnv_bin _candidate
 
 # Machine-specific overrides (not managed by dotfiles)
 [ -f "$HOME/.zshrc_local" ] && source "$HOME/.zshrc_local"

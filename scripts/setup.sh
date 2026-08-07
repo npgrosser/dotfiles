@@ -121,6 +121,19 @@ if ! grep -Fqx "$DOTFILES_SOURCE_LINE" "$ZSHRC"; then
   printf '\n# Dotfiles shared config\n%s\n' "$DOTFILES_SOURCE_LINE" >> "$ZSHRC"
 fi
 
+# fnm is initialized by ~/.zshrc_dotfiles. Remove legacy version-manager
+# blocks from the host zshrc so Node is initialized exactly once.
+if grep -q '^# fnm$' "$ZSHRC"; then
+  echo "🧹 Removing legacy fnm block from ~/.zshrc..."
+  _sed_i '/^# fnm$/,/^fi$/d' "$ZSHRC"
+fi
+if grep -q 'NVM_DIR' "$ZSHRC"; then
+  echo "🧹 Removing legacy nvm initialization from ~/.zshrc..."
+  _sed_i '/^[[:space:]]*export NVM_DIR=/d' "$ZSHRC"
+  _sed_i '\|NVM_DIR/nvm\.sh|d' "$ZSHRC"
+  _sed_i '\|NVM_DIR/bash_completion|d' "$ZSHRC"
+fi
+
 # --- 3. Install git config (via include, preserves user.name/email) ---
 
 echo "📄 Installing ~/.gitconfig_dotfiles..."
@@ -269,7 +282,7 @@ echo "💻 Installing VS Code extensions list..."
 mkdir -p "$HOME/.config/dotfiles"
 cp "$DOTFILES_DIR/config/vscode-extensions.txt" "$HOME/.config/dotfiles/vscode-extensions.txt"
 
-# --- 6. Install cross-platform tools (Claude CLI, uv, Node.js) ---
+# --- 6. Install cross-platform tools (Claude CLI, uv, fnm + Node.js) ---
 
 if _needs claude; then
   echo "🤖 Installing Claude CLI..."
@@ -281,22 +294,40 @@ if _needs uv; then
   curl -LsSf https://astral.sh/uv/install.sh | sh
 fi
 
-_needs_node() {
-  [ "$FORCE" = "1" ] && return 0
-  if command -v node >/dev/null 2>&1 || [ -s "$HOME/.nvm/nvm.sh" ]; then
-    echo "  ✔ node already installed, skipping"
-    return 1
+FNM_INSTALL_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/fnm"
+if [ "$OS" = "Darwin" ]; then
+  _brew_install fnm
+elif [ "$FORCE" = "1" ] \
+  || { ! command -v fnm >/dev/null 2>&1 && [ ! -x "$FNM_INSTALL_DIR/fnm" ]; }; then
+  echo "📦 Installing fnm..."
+  _fnm_install_args=(--skip-shell)
+  if [ "$FORCE" = "1" ]; then
+    _fnm_install_args+=(--force-install)
   fi
-}
-if _needs_node; then
-  echo "📦 Installing nvm + Node.js..."
-  if [ ! -s "$HOME/.nvm/nvm.sh" ]; then
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
-  fi
-  export NVM_DIR="$HOME/.nvm"
-  . "$NVM_DIR/nvm.sh"
-  nvm install node
+  curl -fsSL https://fnm.vercel.app/install | bash -s -- "${_fnm_install_args[@]}"
+else
+  echo "  ✔ fnm already installed, skipping"
 fi
+
+if [ -x "$FNM_INSTALL_DIR/fnm" ]; then
+  export PATH="$FNM_INSTALL_DIR:$PATH"
+fi
+if ! command -v fnm >/dev/null 2>&1; then
+  echo "⚠️  fnm installation failed or fnm is not on PATH."
+  exit 1
+fi
+
+eval "$(fnm env --shell bash)"
+if [ "$FORCE" = "1" ] || ! _fnm_default="$(fnm default 2>/dev/null)"; then
+  echo "📦 Installing the latest Node.js via fnm..."
+  fnm install --latest --use
+  _fnm_version="$(fnm current)"
+  fnm default "${_fnm_version#v}"
+else
+  echo "  ✔ Node.js $_fnm_default already configured via fnm"
+  fnm use --install-if-missing --silent-if-unchanged "$_fnm_default"
+fi
+unset FNM_INSTALL_DIR _fnm_default _fnm_install_args _fnm_version
 
 # --- 7. Install zsh plugins ---
 
