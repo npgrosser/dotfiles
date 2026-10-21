@@ -275,6 +275,8 @@ fi
 
 mkdir -p "$HOME/.claude/plugins/claude-hud"
 cp "$DOTFILES_DIR/config/claude/plugins/claude-hud/config.json" "$HOME/.claude/plugins/claude-hud/config.json"
+cp "$DOTFILES_DIR/config/claude/statusline-extra-usage.py" "$HOME/.claude/statusline-extra-usage.py"
+chmod +x "$HOME/.claude/statusline-extra-usage.py"
 
 # --- 5. Install VS Code extensions list ---
 

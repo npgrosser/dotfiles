@@ -7,41 +7,19 @@
       "Read(//private/tmp/**)"
     ]
   },
-  "model": "claude-opus-4-6",
-  "hooks": {
-    "PreCompact": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bd prime"
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bd prime"
-          }
-        ]
-      }
-    ]
-  },
+  "hooks": {},
   "statusLine": {
     "type": "command",
-    "command": "bash -c 'plugin_dir=$(ls -d \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}\"/plugins/cache/claude-hud/claude-hud/*/ 2>/dev/null | awk -F/ '\"'\"'{ print $(NF-1) \"\\t\" $(0) }'\"'\"' | sort -t. -k1,1n -k2,2n -k3,3n -k4,4n | tail -1 | cut -f2-); rt=$(command -v bun 2>/dev/null || command -v node 2>/dev/null) || exit 1; src=dist/index.js; case \"$(basename \"$rt\")\" in bun) src=src/index.ts;; esac; exec \"$rt\" \"${plugin_dir}${src}\"'"
+    "command": "python3 ~/.claude/statusline-extra-usage.py",
+    "refreshInterval": 30
   },
   "enabledPlugins": {
     "pyright-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
     "gitlab@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
-    "claude-hud@claude-hud": true
+    "claude-hud@claude-hud": true,
+    "codex@openai-codex": true
   },
   "extraKnownMarketplaces": {
     "claude-hud": {
@@ -49,8 +27,18 @@
         "source": "github",
         "repo": "jarrodwatts/claude-hud"
       }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
     }
   },
   "effortLevel": "high",
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "auto",
+  "agentPushNotifEnabled": true,
+  "inputNeededNotifEnabled": true,
+  "autoMemoryEnabled": false
 }
